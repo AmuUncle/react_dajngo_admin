@@ -1,0 +1,102 @@
+from django.http import Http404
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+from api.serializers import SnippetSerializer
+from api.models import Snippet
+from django.contrib.auth import authenticate, login
+from django.contrib.auth.models import User
+import os
+
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+class Regiser(APIView):
+    """
+    List all snippets, or create a new snippet.
+    """
+    def get(self, request):
+        snippets = Snippet.objects.all()
+        serializer = SnippetSerializer(snippets, many=True)
+        return Response(serializer.data)
+
+    def post(self, request):
+        username = request.data.get('userName')
+        password = request.data.get('password')
+        print(username, password)
+        if not (username and password):
+            return Response({"reasoncode": -1, "reason": "ERROR Incorrect username or password"}, status=status.HTTP_200_OK)
+        # 判断用户是否存在
+        user = authenticate(username=username, password=password)
+        if user:
+            return Response({"reasoncode": 1, "reason": "The user has already existed"}, status=status.HTTP_200_OK)
+        else:
+            # 添加到数据库（还可以加一些字段的处理）
+            user = User.objects.create_user(username=username, password=password)
+            user.save()
+            return Response({"reasoncode": 0, "reason": "Regiser was successful"}, status=status.HTTP_200_OK)
+
+
+class Login(APIView):
+    """
+    List all snippets, or create a new snippet.
+    """
+    def get(self, request):
+        snippets = Snippet.objects.all()
+        serializer = SnippetSerializer(snippets, many=True)
+        return Response(serializer.data)
+
+    def post(self, request):
+        username = request.data.get('userName')
+        password = request.data.get('password')
+        print(username,password)
+        user = authenticate(username=username, password=password)
+        if user is not None:
+            r = Response({'uid': 1, 'permissions': ["auth", "auth/testPage", "auth/authPage", "auth/authPage/edit", "auth/authPage/visit"], 'role': "系统管理员", 'roleType': 1, 'userName': username}, status=status.HTTP_200_OK)
+            return r
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+
+class SnippetList(APIView):
+    """
+    List all snippets, or create a new snippet.
+    """
+    def get(self, request):
+        snippets = Snippet.objects.all()
+        serializer = SnippetSerializer(snippets, many=True)
+        return Response(serializer.data)
+
+    def post(self, request):
+        serializer = SnippetSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class GetImgsList(APIView):
+    def file_name(self, file_dir):
+        imgs = []
+        img5 = []
+        i = 1
+        for root, dirs, files in os.walk(file_dir):
+            return files
+
+    def getlist(self, files):
+        imgs = []
+        img5 = []
+        i = 1
+        count = len(files)
+        l = int(count / 5)
+        for file in files:
+
+            if i % l == 0:
+                imgs.append(img5)
+                img5 = []
+            img5.append("http://23.106.155.65:8001/" + file)
+            i += 1
+        print(i, l)
+        return imgs
+
+    def get(self, request):
+        imgs = self.getlist(self.file_name(os.path.join(BASE_DIR, "static/yuanyuan/images/")))
+        return Response({"imgs": imgs}, status=status.HTTP_200_OK)
+
+
