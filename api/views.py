@@ -1,3 +1,4 @@
+# encoding=utf8
 from django.http import Http404
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -31,7 +32,10 @@ class Regiser(APIView):
             sendmail("songyuanyuan.com：注册失败","ERROR Incorrect username or password \n 用户名：{0} 密码: {1} ".format(username, password))
             return Response({"reasoncode": -1, "reason": "ERROR Incorrect username or password"}, status=status.HTTP_200_OK)
         # 判断用户是否存在
-        user = User.objects.get(username=username)
+        try:
+            user = User.objects.get(username=username)
+        except Exception  as err:
+            user = None
         if user:
             sendmail("songyuanyuan.com：注册失败",
                      "The user has already existed \n 用户名：{0} 密码: {1} ".format(username, password))
@@ -116,5 +120,4 @@ class GetImgsList(APIView):
 class GetWeather(APIView):
     def get(self, request):
         weaInfo = getWeather("")
-        print(weaInfo)
         return Response(weaInfo, status=status.HTTP_200_OK)

@@ -9,6 +9,8 @@ mqtt/node_modules
 /coverage
 /node_modules/
 /static/
+crazye-uwsgi.ini
+db.sqlite3
 
 # production
 
