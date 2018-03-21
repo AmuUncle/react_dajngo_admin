@@ -23,4 +23,5 @@ urlpatterns = [
     url(r'^Login/', Login.as_view()),
     url(r'^Regiser/', Regiser.as_view()),
     url(r'^GetImgsList/', GetImgsList.as_view()),
+    url(r'^GetWeather/', GetWeather.as_view()),
 ]

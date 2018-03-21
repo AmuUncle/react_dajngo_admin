@@ -7,8 +7,13 @@ from api.models import Snippet
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.models import User
 import os
+from api.sendmail import sendmail
+from api.getALiYunAPI.getAliYunAPI import *
+
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+
 class Regiser(APIView):
     """
     List all snippets, or create a new snippet.
@@ -23,15 +28,20 @@ class Regiser(APIView):
         password = request.data.get('password')
         print(username, password)
         if not (username and password):
+            sendmail("songyuanyuan.com：注册失败","ERROR Incorrect username or password \n 用户名：{0} 密码: {1} ".format(username, password))
             return Response({"reasoncode": -1, "reason": "ERROR Incorrect username or password"}, status=status.HTTP_200_OK)
         # 判断用户是否存在
-        user = authenticate(username=username, password=password)
+        user = User.objects.get(username=username)
         if user:
+            sendmail("songyuanyuan.com：注册失败",
+                     "The user has already existed \n 用户名：{0} 密码: {1} ".format(username, password))
             return Response({"reasoncode": 1, "reason": "The user has already existed"}, status=status.HTTP_200_OK)
         else:
             # 添加到数据库（还可以加一些字段的处理）
             user = User.objects.create_user(username=username, password=password)
             user.save()
+            sendmail("songyuanyuan.com：注册成功",
+                     "Regiser was successful \n 用户名：{0} 密码: {1} ".format(username, password))
             return Response({"reasoncode": 0, "reason": "Regiser was successful"}, status=status.HTTP_200_OK)
 
 
@@ -50,8 +60,11 @@ class Login(APIView):
         print(username,password)
         user = authenticate(username=username, password=password)
         if user is not None:
-            r = Response({'uid': 1, 'permissions': ["auth", "auth/testPage", "auth/authPage", "auth/authPage/edit", "auth/authPage/visit"], 'role': "系统管理员", 'roleType': 1, 'userName': username}, status=status.HTTP_200_OK)
-            return r
+            sendmail("songyuanyuan.com：登录成功",
+                     "用户名：{0} 密码: {1} ".format(username, password))
+            return Response({'uid': 1, 'permissions': ["auth", "auth/testPage", "auth/authPage", "auth/authPage/edit", "auth/authPage/visit"], 'role': "系统管理员", 'roleType': 1, 'userName': username}, status=status.HTTP_200_OK)
+        sendmail("songyuanyuan.com：登录失败",
+                 "用户名：{0} 密码: {1} ".format(username, password))
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
 class SnippetList(APIView):
@@ -100,3 +113,8 @@ class GetImgsList(APIView):
         return Response({"imgs": imgs}, status=status.HTTP_200_OK)
 
 
+class GetWeather(APIView):
+    def get(self, request):
+        weaInfo = getWeather("")
+        print(weaInfo)
+        return Response(weaInfo, status=status.HTTP_200_OK)
