@@ -89,12 +89,20 @@ class SnippetList(APIView):
 
 
 class GetImgsList(APIView):
+    def fifter(self,files):
+        files_r = []
+        for i in files:
+            (shotname, extension) = os.path.splitext(i)
+            if extension in ['.jpg','.JPG','.png','.bmp','GIF','gif']:
+                files_r.append(i)
+        return files_r
+
     def file_name(self, file_dir):
         imgs = []
         img5 = []
         i = 1
         for root, dirs, files in os.walk(file_dir):
-            return files
+            return self.fifter(files)
 
     def getlist(self, files):
         imgs = []
@@ -114,6 +122,7 @@ class GetImgsList(APIView):
 
     def get(self, request):
         imgs = self.getlist(self.file_name(os.path.join(BASE_DIR, "static/yuanyuan/images/")))
+        print(imgs)
         return Response({"imgs": imgs}, status=status.HTTP_200_OK)
 
 
@@ -121,3 +130,19 @@ class GetWeather(APIView):
     def get(self, request):
         weaInfo = getWeather("")
         return Response(weaInfo, status=status.HTTP_200_OK)
+
+
+class DelImage(APIView):
+    def post(self, request):
+        imgname = request.data.get('img-name')
+        if imgname:
+            print(imgname.split('/'))
+            img = imgname.split('/')[-1]
+            print(img)
+
+            r_file = os.path.join(BASE_DIR, "static/yuanyuan/images/%s" % img)
+            m_file = os.path.join(BASE_DIR, "static/yuanyuan/images/%s.removed" % img)
+            if os.path.exists(r_file):
+                os.rename(r_file, m_file)
+                return Response(status=status.HTTP_200_OK)
+        return Response(status=status.HTTP_404_NOT_FOUND)
