@@ -25,4 +25,5 @@ urlpatterns = [
     url(r'^GetImgsList/', GetImgsList.as_view()),
     url(r'^GetWeather/', GetWeather.as_view()),
     url(r'^DelImage/', DelImage.as_view()),
+    url(r'^upload/$', upload, name='upload'),
 ]

@@ -2,6 +2,7 @@
 from django.http import Http404
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from django.http import HttpResponse
 from rest_framework import status
 from api.serializers import SnippetSerializer
 from api.models import Snippet
@@ -10,6 +11,7 @@ from django.contrib.auth.models import User
 import os
 from api.sendmail import sendmail
 from api.getALiYunAPI.getAliYunAPI import *
+import uuid
 
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -146,3 +148,15 @@ class DelImage(APIView):
                 os.rename(r_file, m_file)
                 return Response(status=status.HTTP_200_OK)
         return Response(status=status.HTTP_404_NOT_FOUND)
+
+
+def upload(request):
+    if request.method == 'POST':
+        obj = request.FILES.get('file')
+        (shotname, extension) = os.path.splitext(obj.name)
+        imgname = "{0}{1}".format( uuid.uuid1(),extension)
+        f = open(os.path.join(BASE_DIR, "static/yuanyuan/images/%s" % imgname), 'wb')
+        for line in obj.chunks():
+            f.write(line)
+        f.close()
+        return HttpResponse('上传成功')
