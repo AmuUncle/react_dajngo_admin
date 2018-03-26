@@ -91,12 +91,13 @@ class SnippetList(APIView):
 
 
 class GetImgsList(APIView):
-    def fifter(self,files):
+    def fifter(self, file_dir, files):
         files_r = []
         for i in files:
             (shotname, extension) = os.path.splitext(i)
-            if extension in ['.jpg','.JPG','.png','.bmp','GIF','gif']:
+            if extension.lower() in ['.jpg','.JPG','.png','.bmp','GIF','gif']:
                 files_r.append(i)
+        files_r = sorted(files_r, reverse=True, key=lambda x: os.path.getmtime(file_dir + x))
         return files_r
 
     def file_name(self, file_dir):
@@ -104,22 +105,23 @@ class GetImgsList(APIView):
         img5 = []
         i = 1
         for root, dirs, files in os.walk(file_dir):
-            return self.fifter(files)
+            return self.fifter(file_dir,files)
 
     def getlist(self, files):
         imgs = []
-        img5 = []
-        i = 1
+        for i in range(len(files)):
+            files[i] = "http://23.106.155.65:8001/%s" % files[i]
         count = len(files)
         l = int(count / 5)
-        for file in files:
-
-            if i % l == 0:
-                imgs.append(img5)
-                img5 = []
-            img5.append("http://23.106.155.65:8001/" + file)
-            i += 1
-        print(i, l)
+        n = count % 5
+        last = 0
+        for i in range(5):
+            if i < n:
+                imgs.append(files[last:last + l + 1])
+                last = last + l + 1
+            else:
+                imgs.append(files[last:last + l])
+                last = last + l
         return imgs
 
     def get(self, request):
@@ -160,3 +162,9 @@ def upload(request):
             f.write(line)
         f.close()
         return HttpResponse('上传成功')
+
+
+class Dash(APIView):
+    def get(self, request):
+        weaInfo = getWeather("")
+        return Response(weaInfo, status=status.HTTP_200_OK)
