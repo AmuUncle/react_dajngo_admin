@@ -4,8 +4,8 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.http import HttpResponse
 from rest_framework import status
-from api.serializers import SnippetSerializer
-from api.models import Snippet
+from api.serializers import SnippetSerializer,CommentSerializer
+from api.models import Snippet,CommentModel
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.models import User
 import os
@@ -201,3 +201,21 @@ class Dash(APIView):
     def get(self, request):
         imgs_count = len(self.file_name(os.path.join(BASE_DIR, "static/yuanyuan/images/")))
         return Response({"dash": {"imgs": imgs_count, "email": 220, "yun_data":31025, "Collection":301}}, status=status.HTTP_200_OK)
+
+class Comment(APIView):
+    def post(self, request):
+        comData = request.data.get('data')
+        if comData:
+            print(comData)
+            comment = CommentModel()
+            comment.uReply = comData['uReply']
+            comment.uName = comData['uName']
+            comment.uComment = comData['uComment']
+            comment.uUrl = comData['uUrl']
+            comment.uImg = comData['uImg']
+            comment.uTime = comData['uTime']
+            comment.save()
+
+        snippets = CommentModel.objects.all().order_by('-id')[:10]
+        serializer = CommentSerializer(snippets, many=True)
+        return Response(serializer.data)

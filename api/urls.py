@@ -27,4 +27,5 @@ urlpatterns = [
     url(r'^DelImage/', DelImage.as_view()),
     url(r'^upload/$', upload, name='upload'),
     url(r'^Dash/', Dash.as_view()),
+    url(r'^comment/', Comment.as_view()),
 ]
