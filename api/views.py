@@ -206,16 +206,16 @@ class Comment(APIView):
     def post(self, request):
         comData = request.data.get('data')
         if comData:
-            print(comData)
-            comment = CommentModel()
-            comment.uReply = comData['uReply']
-            comment.uName = comData['uName']
-            comment.uComment = comData['uComment']
-            comment.uUrl = comData['uUrl']
-            comment.uImg = comData['uImg']
-            comment.uTime = comData['uTime']
-            comment.save()
+            serializer = CommentSerializer(data=comData)
+            if serializer.is_valid():
+                serializer.save()
+        comData = request.data.get('update')
+        if comData:
+            _comment = CommentModel.objects.get(id=int(comData['id']))
+            _comment.endorse = comData['endorse']
+            _comment.oppose = comData['oppose']
+            _comment.save()
 
-        snippets = CommentModel.objects.all().order_by('-id')[:10]
+        snippets = CommentModel.objects.all().order_by('-id')[:100]
         serializer = CommentSerializer(snippets, many=True)
         return Response(serializer.data)

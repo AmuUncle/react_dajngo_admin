@@ -14,3 +14,5 @@ class CommentModel(models.Model):
     uUrl = models.CharField(max_length=300, blank=True, default='')
     uImg = models.CharField(max_length=300, blank=True, default='')
     uTime = models.CharField(max_length=300, blank=True, default='')
+    endorse = models.IntegerField(default=0)
+    oppose = models.IntegerField(default=0)
