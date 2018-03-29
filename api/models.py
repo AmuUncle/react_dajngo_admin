@@ -8,7 +8,6 @@ class Snippet(models.Model):
 
 
 class CommentModel(models.Model):
-    uReply = models.CharField(max_length=300, blank=True, default='')
     uName = models.CharField(max_length=300, blank=True, default='')
     uComment = models.CharField(max_length=2000, blank=True, default='')
     uUrl = models.CharField(max_length=300, blank=True, default='')
@@ -16,3 +15,6 @@ class CommentModel(models.Model):
     uTime = models.CharField(max_length=300, blank=True, default='')
     endorse = models.IntegerField(default=0)
     oppose = models.IntegerField(default=0)
+    hasReply = models.BooleanField(default=False)
+    rName = models.CharField(max_length=300, blank=True, default='')
+    rComment = models.CharField(max_length=300, blank=True, default='')

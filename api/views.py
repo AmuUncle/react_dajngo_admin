@@ -12,6 +12,8 @@ import os
 from api.sendmail import sendmail
 from api.getALiYunAPI.getAliYunAPI import *
 import uuid
+from wsgiref.util import FileWrapper
+from api.avatar.app import ff
 
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -206,8 +208,10 @@ class Comment(APIView):
     def post(self, request):
         comData = request.data.get('data')
         if comData:
+            print(comData)
             serializer = CommentSerializer(data=comData)
             if serializer.is_valid():
+                print(comData)
                 serializer.save()
         comData = request.data.get('update')
         if comData:
@@ -218,4 +222,12 @@ class Comment(APIView):
 
         snippets = CommentModel.objects.all().order_by('-id')[:100]
         serializer = CommentSerializer(snippets, many=True)
+        print(serializer.data)
         return Response(serializer.data)
+
+
+def getAvatar(request):
+    if request.method == 'GET':
+        response = HttpResponse(ff(100), content_type='application/png')
+        response['Content-Disposition'] = 'attachment; filename={0}'.format("xx.png")
+        return response

@@ -11,4 +11,4 @@ class SnippetSerializer(serializers.ModelSerializer):
 class CommentSerializer(serializers.ModelSerializer):
     class Meta:
         model = CommentModel
-        fields = ('id', 'uReply', 'uName', 'uComment', 'uUrl', 'uImg', 'uTime','endorse','oppose')
+        fields = ('id', 'uName', 'uComment', 'uUrl', 'uImg', 'uTime','endorse','oppose','hasReply','rName','rComment')

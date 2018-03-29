@@ -28,4 +28,5 @@ urlpatterns = [
     url(r'^upload/$', upload, name='upload'),
     url(r'^Dash/', Dash.as_view()),
     url(r'^comment/', Comment.as_view()),
+    url(r'^getAvatar/', getAvatar, name='getAvatar'),
 ]
