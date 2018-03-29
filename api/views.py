@@ -208,10 +208,8 @@ class Comment(APIView):
     def post(self, request):
         comData = request.data.get('data')
         if comData:
-            print(comData)
             serializer = CommentSerializer(data=comData)
             if serializer.is_valid():
-                print(comData)
                 serializer.save()
         comData = request.data.get('update')
         if comData:
@@ -222,7 +220,6 @@ class Comment(APIView):
 
         snippets = CommentModel.objects.all().order_by('-id')[:100]
         serializer = CommentSerializer(snippets, many=True)
-        print(serializer.data)
         return Response(serializer.data)
 
 
