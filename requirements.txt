@@ -3,7 +3,7 @@ chardet==3.0.4
 cssselect==1.0.3
 Django==1.10.5
 django-cors-headers==2.2.0
-djangorestframework==3.7.7
+djangorestframework==3.9.1
 idna==2.6
 lxml==4.2.0
 Markdown==2.6.11
